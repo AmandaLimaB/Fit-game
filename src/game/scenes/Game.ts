@@ -52,6 +52,12 @@ export class Game extends Scene
         // Configurações físicas do Pou
         this.jogador.setCollideWorldBounds(true); // Impede o Pou de sair pelas bordas do ecrã
         this.jogador.setBounce(0.1); // Dá um minúsculo saltinho ao bater no chão, sem parecer uma bola de basquete
+
+        // ==========================================
+        // 4. SISTEMA DE COLISÕES (Física Arcade)
+
+        // Fazer o jogador colidir com um grupo de plataformas
+        this.physics.add.collider(this.jogador, this.plataformas);
     }
 
     update ()
