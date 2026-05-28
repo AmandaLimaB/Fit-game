@@ -77,7 +77,7 @@ export class Game extends Scene
 
         //INTERFACE DO UTILIZADOR
         const dicionario = this.cache.json.get('traducoes');
-        const idiomaAtual = 'pt'; 
+        const idiomaAtual = this.registry.get('idioma') || 'pt';
 
         const textoLabelProteina = dicionario[idiomaAtual].proteina;
         const textoLabelEnergia = dicionario[idiomaAtual].energia;
@@ -161,7 +161,7 @@ export class Game extends Scene
 
         this.pontuacao += 100;
         const dicionario = this.cache.json.get('traducoes');
-        const idiomaAtual = 'pt'; 
+       const idiomaAtual = this.registry.get('idioma') || 'pt';
         this.textoPontuacao.setText(dicionario[idiomaAtual].proteina + this.pontuacao);
 
         if (this.pontuacao >= 1000)
@@ -177,7 +177,7 @@ export class Game extends Scene
 
         this.vidas -= 1;
         const dicionario = this.cache.json.get('traducoes');
-        const idiomaAtual = 'pt'; 
+        const idiomaAtual = this.registry.get('idioma') || 'pt';
         this.textoVidas.setText(dicionario[idiomaAtual].energia + this.vidas);
 
         if (this.vidas <= 0)
