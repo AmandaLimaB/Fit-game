@@ -8,7 +8,7 @@ export class Game extends Scene
     private teclas !: Phaser.Types.Input.Keyboard.CursorKeys;
 
     private proteinas!: Phaser.Physics.Arcade.Group;
-    private obstaculos!: Phase.Physics.Arcade.Group;
+    private obstaculos!: Phaser.Physics.Arcade.Group;
 
     private pontuacao: number =0;
     private vidas: number = 3;
@@ -132,12 +132,12 @@ export class Game extends Scene
         }
     }
 
-    private coletarProteina(playerObj: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile, itemObj: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile)
+    private coletarProteina(playerObj: any, itemObj: any)
     {
-        // Fazer cast seguro para Sprite do Phaser
         const item = itemObj as Phaser.Physics.Arcade.Sprite;
         
-        item.disableBody(true, true); //Remove o item da tela
+        // Remove o item do ecrã e da memória física
+        item.disableBody(true, true);
 
         this.pontuacao += 100;
         this.textoPontuacao.setText('Proteina: ' + this.pontuacao);
@@ -148,7 +148,7 @@ export class Game extends Scene
         }
     }
 
-    private baterNoObstaculo(playerObj: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile, obstaculoObj: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile)
+    private baterNoObstaculo(playerObj: any, obstaculoObj: any)
     {
         const obstaculo = obstaculoObj as Phaser.Physics.Arcade.Sprite;
         obstaculo.disableBody(true, true);
