@@ -13,6 +13,14 @@ const config: Phaser.Types.Core.GameConfig = {
     height: 768,
     parent: 'game-container',
     backgroundColor: '#028af8',
+    
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { x: 0, y: 400 }, // Gravidade para empurrar o Pou e os itens para baixo
+            debug: true // Desenha caixas verdes nas sprites para vermos os limites físicos enquanto programamos
+        }
+    },
     scene: [
         Boot,
         Preloader,
