@@ -73,6 +73,10 @@ export class Game extends Scene
         
         // Quando o jogador toca num obstáculo, ativa a função 'baterNoObstaculo'
         this.physics.add.overlap(this.jogador, this.obstaculos, this.baterNoObstaculo, undefined, this); //Interação com obstáculos
+
+        //INTERFACE DO UTILIZADOR
+        this.textoPontuacao = this.add.text(16, 16, 'Proteina: 0', { fontSize: '32px', color: '#fff', fontFamily: 'Arial' });
+        this.textoVidas = this.add.text(800, 16, 'Energia: 3', { fontSize: '32px', color: '#fff', fontFamily: 'Arial' });
     }
 
     //O método update corre 60 vezes por segundo a ler as teclas
