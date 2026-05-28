@@ -131,4 +131,20 @@ export class Game extends Scene
             o.setBounceY(0.1);
         }
     }
+
+    private coletarProteina(playerObj: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile, itemObj: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile)
+    {
+        // Fazer cast seguro para Sprite do Phaser
+        const item = itemObj as Phaser.Physics.Arcade.Sprite;
+        
+        item.disableBody(true, true); //Remove o item da tela
+
+        this.pontuacao += 100;
+        this.textoPontuacao.setText('Proteina: ' + this.pontuacao);
+
+        if (this.pontuacao >= 1000)
+        {
+            this.scene.start('GameOver');
+        }
+    }
 }
