@@ -68,8 +68,11 @@ export class Game extends Scene
         }
     }
 
+    //O método update corre 60 vezes por segundo a ler as teclas
     update ()
     {
+        // Se as teclas não foram configuradas por segurança, não faz nada
+        if (!this.teclas || !this.jogador) return;
 
     }
 }
