@@ -147,4 +147,23 @@ export class Game extends Scene
             this.scene.start('GameOver');
         }
     }
+
+    private baterNoObstaculo(playerObj: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile, obstaculoObj: Phaser.Types.Physics.Arcade.GameObjectWithBody | Phaser.Tilemaps.Tile)
+    {
+        const obstaculo = obstaculoObj as Phaser.Physics.Arcade.Sprite;
+        obstaculo.disableBody(true, true);
+
+        this.vidas -= 1;
+        this.textoVidas.setText('Energia: ' + this.vidas);
+
+        if (this.vidas <= 0)
+        {
+            this.physics.pause();
+            this.jogador.setTint(0xff0000); // Pinta o Pou de vermelho para marcar o impacto
+
+            this.time.delayedCall(1000, () => {
+                this.scene.start('GameOver');
+            });
+        }
+    }
 }
