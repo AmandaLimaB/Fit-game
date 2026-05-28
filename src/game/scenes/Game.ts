@@ -170,6 +170,7 @@ export class Game extends Scene
         }
     }
 
+    //Consertar depois
     private baterNoObstaculo(playerObj: any, obstaculoObj: any)
     {
         const obstaculo = obstaculoObj as Phaser.Physics.Arcade.Sprite;
@@ -182,12 +183,7 @@ export class Game extends Scene
 
         if (this.vidas <= 0)
         {
-            this.physics.pause();
-            this.jogador.setTint(0xff0000); // Pinta o Pou de vermelho para marcar o impacto
-
-            this.time.delayedCall(1000, () => {
-                this.scene.start('GameOver', { pontosFinais: this.pontuacao, resultado: 'derrota' });
-            });
+            this.scene.start('GameOver', { pontosFinais: this.pontuacao, resultado: 'derrota' });
         }
     }
 }
