@@ -22,7 +22,7 @@ export class Game extends Scene
 
     create ()
     {
-        this.cameras.main.setBackgroundColor('#2c3e50'); //Cor de fundo cinza
+        this.cameras.main.setBackgroundColor('#2c3e50');
 
         this.pontuacao = 0;
         this.vidas = 3;
@@ -47,13 +47,27 @@ export class Game extends Scene
         this.jogador.setBounce(0.1); // Salto ao bater no chão
 
         //SISTEMA DE COLISÕES (Física Arcade)
-
-        this.physics.add.collider(this.jogador, this.plataformas); // Fazer o jogador colidir com um grupo de plataformas
+        this.physics.add.collider(this.jogador, this.plataformas);
       
         // ATIVAÇÃO DOS BOTÕES DO TECLADO (Input)
         if (this.input.keyboard) {
             this.teclas = this.input.keyboard.createCursorKeys();
         }
+        
+        //TEXTURAS PARA PROTEÍNAS E OBSTÁCULOS
+        const proteinaGrafica = this.make.graphics({ x: 0, y: 0 }).fillStyle(0x3498db).fillCircle(15, 15, 15);
+        proteinaGrafica.generateTexture('proteina_temp', 30, 30);
+        const obstaculoGrafico = this.make.graphics({ x: 0, y: 0 }).fillStyle(0xe74c3c).fillRect(0, 0, 30, 30);
+        obstaculoGrafico.generateTexture('obstaculo_temp', 30, 30);
+
+        // Armazenar os objetos na memória
+        this.proteinas = this.physics.add.group();
+        this.obstaculos = this.physics.add.group();
+
+        // Colisão de proteinas e obstáculos com as plataformas
+        this.physics.add.collider(this.proteinas, this.plataformas);
+        this.physics.add.collider(this.obstaculos, this.plataformas);
+
     }
 
     //O método update corre 60 vezes por segundo a ler as teclas
@@ -62,7 +76,7 @@ export class Game extends Scene
         // Se as teclas não foram configuradas por segurança, não faz nada
         if (!this.teclas || !this.jogador) return;
 
-        // ---- MOVIMENTO HORIZONTAL ----
+        // Movimento horizontal
         if (this.teclas.left.isDown)
         {
             this.jogador.setVelocityX(-300);
@@ -77,7 +91,7 @@ export class Game extends Scene
             this.jogador.setVelocityX(0); //Se não carregar nada, o Pou fica parado horizontalmente
         }
 
-        // ---- MOVIMENTO VERTICAL (O SALTO) ----
+        // Movimento vertical
         if (this.teclas.space.isDown && this.jogador.body.touching.down)
         {
             this.jogador.setVelocityY(-450); //Velocidade negativa, Pou sobe
