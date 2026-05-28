@@ -58,6 +58,14 @@ export class Game extends Scene
 
         // Fazer o jogador colidir com um grupo de plataformas
         this.physics.add.collider(this.jogador, this.plataformas);
+
+        // ==========================================
+        // 5. ATIVAÇÃO DOS CONTROLOS (Input)
+
+        // Ativar as Setas do Teclado (Cima, Baixo, Esquerda, Direita) + a Barra de Espaço
+        if (this.input.keyboard) {
+            this.teclas = this.input.keyboard.createCursorKeys();
+        }
     }
 
     update ()
