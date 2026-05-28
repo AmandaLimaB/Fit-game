@@ -10,6 +10,11 @@ export class Game extends Scene
     private proteinas!: Phaser.Physics.Arcade.Group;
     private obstaculos!: Phase.Physics.Arcade.Group;
 
+    private pontuacao: number =0;
+    private vidas: number = 3;
+    private textoPontuacao!: Phaser.GameObjects.Text;
+    private textoVidas!: Phaser.GameObjects.Text;
+
     constructor ()
     {
         super('Game');
