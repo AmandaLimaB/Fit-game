@@ -24,28 +24,25 @@ export class Game extends Scene
     {
         this.cameras.main.setBackgroundColor('#2c3e50'); //Cor de fundo cinza
 
-        //CRIAÇÃO DO CHÃO E PLATAFORMAS (Static Group)
-        
-        this.plataformas = this.physics.add.staticGroup();
+        this.pontuacao = 0;
+        this.vidas = 3;
 
+        //CRIAÇÃO DO CHÃO E PLATAFORMAS (Static Group)
+        this.plataformas = this.physics.add.staticGroup();
         const chãoGrafico = this.make.graphics({ x: 0, y: 0 }).fillStyle(0x27ae60).fillRect(0, 0, 1024, 40);
         chãoGrafico.generateTexture('chão_temp', 1024, 40);
-
         const platGrafica = this.make.graphics({ x: 0, y: 0 }).fillStyle(0x7f8c8d).fillRect(0, 0, 200, 30); // Blocos cinzentos
         platGrafica.generateTexture('plat_temp', 200, 30);
 
-        this.plataformas.create(512, 748, 'chão_temp'); // Posicionar o chão principal
-
-        // Duas plataformas aereas
+        this.plataformas.create(512, 748, 'chão_temp');
         this.plataformas.create(300, 550, 'plat_temp');
         this.plataformas.create(724, 420, 'plat_temp');
+
 
         //CRIAÇÃO DO JOGADOR - POU (Dynamic Body)
         const pouGrafico = this.make.graphics({ x: 0, y: 0 }).fillStyle(0xe67e22).fillCircle(25, 25, 25);
         pouGrafico.generateTexture('pou_temp', 50, 50);
-
         this.jogador = this.physics.add.sprite(512, 100, 'pou_temp');
-
         this.jogador.setCollideWorldBounds(true); // Impede o Pou de sair pelas bordas do ecrã
         this.jogador.setBounce(0.1); // Salto ao bater no chão
 
