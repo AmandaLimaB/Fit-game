@@ -104,7 +104,6 @@ export class Game extends Scene
         }
         else
         {
-            
             this.jogador.setVelocityX(0); //Se não carregar nada, o Pou fica parado horizontalmente
         }
 
@@ -114,5 +113,22 @@ export class Game extends Scene
             this.jogador.setVelocityY(-450); //Velocidade negativa, Pou sobe
         }
 
+    }
+
+    private gerarItem()
+    {
+        const xAleatorio = Phaser.Math.Between(50, 974);
+        
+        // Proteína 80% de chance e obstáculo 20% de chance
+        if (Phaser.Math.Between(1, 10) <= 8)
+        {
+            const p = this.proteinas.create(xAleatorio, 0, 'proteina_temp'); //Nasce no topo
+            p.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4)); // Protéina quicar
+        }
+        else
+        {
+            const o = this.obstaculos.create(xAleatorio, 0, 'obstaculo_temp');
+            o.setBounceY(0.1);
+        }
     }
 }
