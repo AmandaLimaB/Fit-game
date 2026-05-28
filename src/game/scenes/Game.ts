@@ -161,12 +161,12 @@ export class Game extends Scene
 
         this.pontuacao += 100;
         const dicionario = this.cache.json.get('traducoes');
-       const idiomaAtual = this.registry.get('idioma') || 'pt';
+        const idiomaAtual = this.registry.get('idioma') || 'pt';
         this.textoPontuacao.setText(dicionario[idiomaAtual].proteina + this.pontuacao);
 
         if (this.pontuacao >= 1000)
         {
-            this.scene.start('GameOver');
+            this.scene.start('GameOver', {pontosFinais: this.pontuacao, resultado: 'vitoria'});
         }
     }
 
@@ -186,7 +186,7 @@ export class Game extends Scene
             this.jogador.setTint(0xff0000); // Pinta o Pou de vermelho para marcar o impacto
 
             this.time.delayedCall(1000, () => {
-                this.scene.start('GameOver');
+                this.scene.start('GameOver', { pontosFinais: this.pontuacao, resultado: 'derrota' });
             });
         }
     }
