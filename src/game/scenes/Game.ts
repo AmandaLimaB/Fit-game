@@ -91,5 +91,13 @@ export class Game extends Scene
             this.jogador.setVelocityX(0);
         }
 
+        // ---- MOVIMENTO VERTICAL (O SALTO) ----
+        // O Pou só pode saltar se a Barra de Espaço estiver premida E se ele estiver firmemente apoiado no chão/plataforma
+        if (this.teclas.space.isDown && this.jogador.body.touching.down)
+        {
+            // Velocidade Y negativa empurra o corpo para CIMA, contrariando a gravidade
+            this.jogador.setVelocityY(-450);
+        }
+
     }
 }
