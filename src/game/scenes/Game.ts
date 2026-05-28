@@ -68,6 +68,11 @@ export class Game extends Scene
         this.physics.add.collider(this.proteinas, this.plataformas);
         this.physics.add.collider(this.obstaculos, this.plataformas);
 
+        //INTERAÇÃO DE SOBREPOSIÇÃO (Overlap)
+        this.physics.add.overlap(this.jogador, this.proteinas, this.coletarProteina, undefined, this); //Interação com proteínas
+        
+        // Quando o jogador toca num obstáculo, ativa a função 'baterNoObstaculo'
+        this.physics.add.overlap(this.jogador, this.obstaculos, this.baterNoObstaculo, undefined, this); //Interação com obstáculos
     }
 
     //O método update corre 60 vezes por segundo a ler as teclas
