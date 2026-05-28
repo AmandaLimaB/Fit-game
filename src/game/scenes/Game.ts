@@ -76,8 +76,14 @@ export class Game extends Scene
         this.physics.add.overlap(this.jogador, this.obstaculos, this.baterNoObstaculo, undefined, this); //Interação com obstáculos
 
         //INTERFACE DO UTILIZADOR
-        this.textoPontuacao = this.add.text(16, 16, 'Proteina: 0', { fontSize: '32px', color: '#fff', fontFamily: 'Arial' });
-        this.textoVidas = this.add.text(800, 16, 'Energia: 3', { fontSize: '32px', color: '#fff', fontFamily: 'Arial' });
+        const dicionario = this.cache.json.get('traducoes');
+        const idiomaAtual = 'pt'; 
+
+        const textoLabelProteina = dicionario[idiomaAtual].proteina;
+        const textoLabelEnergia = dicionario[idiomaAtual].energia;
+
+        this.textoPontuacao = this.add.text(16, 16, textoLabelProteina + '0', { fontSize: '32px', color: '#fff', fontFamily: 'Arial' });
+        this.textoVidas = this.add.text(800, 16, textoLabelEnergia + '3', { fontSize: '32px', color: '#fff', fontFamily: 'Arial' });
 
         //GERAÇÃO AUTOMÁTICA DOS ITENS
         this.time.addEvent({
