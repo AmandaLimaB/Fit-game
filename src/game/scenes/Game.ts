@@ -160,7 +160,9 @@ export class Game extends Scene
         item.disableBody(true, true);
 
         this.pontuacao += 100;
-        this.textoPontuacao.setText('Proteina: ' + this.pontuacao);
+        const dicionario = this.cache.json.get('traducoes');
+        const idiomaAtual = 'pt'; 
+        this.textoPontuacao.setText(dicionario[idiomaAtual].proteina + this.pontuacao);
 
         if (this.pontuacao >= 1000)
         {
@@ -174,7 +176,9 @@ export class Game extends Scene
         obstaculo.disableBody(true, true);
 
         this.vidas -= 1;
-        this.textoVidas.setText('Energia: ' + this.vidas);
+        const dicionario = this.cache.json.get('traducoes');
+        const idiomaAtual = 'pt'; 
+        this.textoVidas.setText(dicionario[idiomaAtual].energia + this.vidas);
 
         if (this.vidas <= 0)
         {
