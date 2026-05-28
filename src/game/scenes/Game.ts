@@ -77,6 +77,14 @@ export class Game extends Scene
         //INTERFACE DO UTILIZADOR
         this.textoPontuacao = this.add.text(16, 16, 'Proteina: 0', { fontSize: '32px', color: '#fff', fontFamily: 'Arial' });
         this.textoVidas = this.add.text(800, 16, 'Energia: 3', { fontSize: '32px', color: '#fff', fontFamily: 'Arial' });
+
+        //GERAÇÃO AUTOMÁTICA DOS ITENS
+        this.time.addEvent({
+            delay: 1500,
+            callback: this.gerarItem,
+            callbackScope: this,
+            loop: true
+        });
     }
 
     //O método update corre 60 vezes por segundo a ler as teclas
