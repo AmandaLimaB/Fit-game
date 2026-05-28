@@ -2,10 +2,13 @@ import { Scene } from 'phaser';
 
 export class Game extends Scene
 {
-    // 1. Declaração de variáveis globais
+    //Declaração de variáveis globais
     private jogador!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
     private plataformas!: Phaser.Physics.Arcade.StaticGroup;
     private teclas !: Phaser.Types.Input.Keyboard.CursorKeys;
+
+    private proteinas!: Phaser.Physics.Arcade.Group;
+    private obstaculos!: Phase.Physics.Arcade.Group;
 
     constructor ()
     {
@@ -14,55 +17,38 @@ export class Game extends Scene
 
     create ()
     {
-        // Limpar a cor de fundo para um cinzento de ginásio
-        this.cameras.main.setBackgroundColor('#2c3e50');
+        this.cameras.main.setBackgroundColor('#2c3e50'); //Cor de fundo cinza
 
-        //==========================================
-        // 2. CRIAÇÃO DO CHÃO E PLATAFORMAS (Static Group)
-
-        // Objetos que não saem do sítio e servem de barreira
+        //CRIAÇÃO DO CHÃO E PLATAFORMAS (Static Group)
+        
         this.plataformas = this.physics.add.staticGroup();
 
-        // Vamos criar uma textura temporária para o chão por código (um bloco verde)
-        // createRectangle(x, y, largura, altura, cor)
         const chãoGrafico = this.make.graphics({ x: 0, y: 0 }).fillStyle(0x27ae60).fillRect(0, 0, 1024, 40);
         chãoGrafico.generateTexture('chão_temp', 1024, 40);
 
-        // Blocos cinzentos como caixas de Crossfit
-        const platGrafica = this.make.graphics({ x: 0, y: 0 }).fillStyle(0x7f8c8d).fillRect(0, 0, 200, 30);
+        const platGrafica = this.make.graphics({ x: 0, y: 0 }).fillStyle(0x7f8c8d).fillRect(0, 0, 200, 30); // Blocos cinzentos
         platGrafica.generateTexture('plat_temp', 200, 30);
 
-        // Posicionar o Chão principal no fundo do ecrã (X: 512 [meio], Y: 748 [perto do fundo])
-        this.plataformas.create(512, 748, 'chão_temp');
+        this.plataformas.create(512, 748, 'chão_temp'); // Posicionar o chão principal
 
-        // Posicionar duas plataformas aéreas para o Pou poder subir e saltar
+        // Duas plataformas aereas
         this.plataformas.create(300, 550, 'plat_temp');
         this.plataformas.create(724, 420, 'plat_temp');
 
-        //==========================================
-        // 3. CRIAÇÃO DO JOGADOR - POU (Dynamic Body)
-
-        // Textura circular laranja temporária para fingir que é o Pou
+        //CRIAÇÃO DO JOGADOR - POU (Dynamic Body)
         const pouGrafico = this.make.graphics({ x: 0, y: 0 }).fillStyle(0xe67e22).fillCircle(25, 25, 25);
         pouGrafico.generateTexture('pou_temp', 50, 50);
 
-        // Instanciar o jogador com física dinâmica (sofre gravidade)
         this.jogador = this.physics.add.sprite(512, 100, 'pou_temp');
 
-        // Configurações físicas do Pou
         this.jogador.setCollideWorldBounds(true); // Impede o Pou de sair pelas bordas do ecrã
-        this.jogador.setBounce(0.1); // Dá um minúsculo saltinho ao bater no chão, sem parecer uma bola de basquete
+        this.jogador.setBounce(0.1); // Salto ao bater no chão
 
-        // ==========================================
-        // 4. SISTEMA DE COLISÕES (Física Arcade)
+        //SISTEMA DE COLISÕES (Física Arcade)
 
-        // Fazer o jogador colidir com um grupo de plataformas
-        this.physics.add.collider(this.jogador, this.plataformas);
-
-        // ==========================================
-        // 5. ATIVAÇÃO DOS CONTROLOS (Input)
-
-        // Ativar as Setas do Teclado (Cima, Baixo, Esquerda, Direita) + a Barra de Espaço
+        this.physics.add.collider(this.jogador, this.plataformas); // Fazer o jogador colidir com um grupo de plataformas
+      
+        // ATIVAÇÃO DOS BOTÕES DO TECLADO (Input)
         if (this.input.keyboard) {
             this.teclas = this.input.keyboard.createCursorKeys();
         }
@@ -77,26 +63,22 @@ export class Game extends Scene
         // ---- MOVIMENTO HORIZONTAL ----
         if (this.teclas.left.isDown)
         {
-            // Mover para a esquerda (Velocidade X negativa)
             this.jogador.setVelocityX(-300);
         }
         else if (this.teclas.right.isDown)
         {
-            // Mover para a direita (Velocidade X positiva)
             this.jogador.setVelocityX(300);
         }
         else
         {
-            // Se não carrega em nada, o Pou fica parado no eixo X
-            this.jogador.setVelocityX(0);
+            
+            this.jogador.setVelocityX(0); //Se não carregar nada, o Pou fica parado horizontalmente
         }
 
         // ---- MOVIMENTO VERTICAL (O SALTO) ----
-        // O Pou só pode saltar se a Barra de Espaço estiver premida E se ele estiver firmemente apoiado no chão/plataforma
         if (this.teclas.space.isDown && this.jogador.body.touching.down)
         {
-            // Velocidade Y negativa empurra o corpo para CIMA, contrariando a gravidade
-            this.jogador.setVelocityY(-450);
+            this.jogador.setVelocityY(-450); //Velocidade negativa, Pou sobe
         }
 
     }
