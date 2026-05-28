@@ -74,5 +74,22 @@ export class Game extends Scene
         // Se as teclas não foram configuradas por segurança, não faz nada
         if (!this.teclas || !this.jogador) return;
 
+        // ---- MOVIMENTO HORIZONTAL ----
+        if (this.teclas.left.isDown)
+        {
+            // Mover para a esquerda (Velocidade X negativa)
+            this.jogador.setVelocityX(-300);
+        }
+        else if (this.teclas.right.isDown)
+        {
+            // Mover para a direita (Velocidade X positiva)
+            this.jogador.setVelocityX(300);
+        }
+        else
+        {
+            // Se não carrega em nada, o Pou fica parado no eixo X
+            this.jogador.setVelocityX(0);
+        }
+
     }
 }
