@@ -1,3 +1,4 @@
+import * as Phaser from 'phaser';
 import { Scene } from 'phaser';
 
 export class Game extends Scene
@@ -81,8 +82,9 @@ export class Game extends Scene
         //GERAÇÃO AUTOMÁTICA DOS ITENS
         this.time.addEvent({
             delay: 1500,
-            callback: this.gerarItem,
-            callbackScope: this,
+            callback: () => {
+                this.gerarItem();
+            },
             loop: true
         });
     }
@@ -117,18 +119,30 @@ export class Game extends Scene
 
     private gerarItem()
     {
-        const xAleatorio = Phaser.Math.Between(50, 974);
-        
-        // Proteína 80% de chance e obstáculo 20% de chance
-        if (Phaser.Math.Between(1, 10) <= 8)
-        {
-            const p = this.proteinas.create(xAleatorio, 0, 'proteina_temp'); //Nasce no topo
-            p.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4)); // Protéina quicar
-        }
-        else
-        {
-            const o = this.obstaculos.create(xAleatorio, 0, 'obstaculo_temp');
-            o.setBounceY(0.1);
+        try {
+            const xAleatorio = Phaser.Math.Between(50, 974);
+            
+            // Proteína 80% de chance e obstáculo 20% de chance
+            if (Phaser.Math.Between(1, 10) <= 8)
+            {
+                // Criamos o item e dizemos ao código que ele é uma Sprite Física
+                const p = this.proteinas.create(xAleatorio, 0, 'proteina_temp') as Phaser.Physics.Arcade.Sprite;
+                
+                // Verificação de segurança: só aplica o ressalto se o corpo físico existir
+                if (p && p.body) {
+                    p.setBounce(0, Phaser.Math.FloatBetween(0.2, 0.4)); 
+                }
+            }
+            else
+            {
+                const o = this.obstaculos.create(xAleatorio, 0, 'obstaculo_temp') as Phaser.Physics.Arcade.Sprite;
+                
+                if (o && o.body) {
+                    o.setBounce(0, 0.1);
+                }
+            }
+        } catch (erro) {
+            console.error("Erro fatal evitado na geração do item:", erro);
         }
     }
 
