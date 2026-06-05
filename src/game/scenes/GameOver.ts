@@ -1,6 +1,6 @@
-import { Scene } from 'phaser';
+import * as Phaser from 'phaser';
 
-export class GameOver extends Scene
+export class GameOver extends Phaser.Scene
 {
     private pontosFinais: number = 0;
     private resultado: string = 'derrota';
