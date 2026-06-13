@@ -16,6 +16,9 @@ export class Game extends Scene
     private textoPontuacao!: Phaser.GameObjects.Text;
     private textoVidas!: Phaser.GameObjects.Text;
 
+    private proximaPlataformaY: number = 400; 
+    private barraMorteY: number = 800;
+
     constructor ()
     {
         super('Game');
@@ -32,34 +35,45 @@ export class Game extends Scene
         this.plataformas = this.physics.add.staticGroup();
         const chãoGrafico = this.make.graphics({ x: 0, y: 0 }).fillStyle(0x27ae60).fillRect(0, 0, 1024, 40);
         chãoGrafico.generateTexture('chão_temp', 1024, 40);
+        // CRIAÇÃO DAS PLATAFORMAS INICIAIS (Static Group)
+        this.plataformas = this.physics.add.staticGroup();
         const platGrafica = this.make.graphics({ x: 0, y: 0 }).fillStyle(0x7f8c8d).fillRect(0, 0, 200, 30); // Blocos cinzentos
         platGrafica.generateTexture('plat_temp', 200, 30);
 
-        this.plataformas.create(512, 748, 'chão_temp');
-        this.plataformas.create(300, 550, 'plat_temp');
-        this.plataformas.create(724, 420, 'plat_temp');
+        // Criamos uma plataforma inicial logo abaixo de onde o jogador nasce
+        this.plataformas.create(512, 650, 'plat_temp');
+        
+        // Algumas plataformas de teste um pouco mais acima
+        this.plataformas.create(300, 450, 'plat_temp');
+        this.plataformas.create(724, 250, 'plat_temp');
 
+        // Ajuste CRÍTICO: Fazer as plataformas terem colisão apenas na parte de cima.
+        // Isso permite que o Pou passe por baixo delas sem bater a cabeça enquanto sobe.
+        this.plataformas.getChildren().forEach((platObj: any) => {
+            const plataforma = platObj as Phaser.Physics.Arcade.Sprite;
+            if (plataforma.body) {
+                plataforma.body.checkCollision.down = false;
+                plataforma.body.checkCollision.left = false;
+                plataforma.body.checkCollision.right = false;
+            }
+        });
 
-        //CRIAÇÃO DO JOGADOR - POU (Dynamic Body)
-        const pouGrafico = this.make.graphics({ x: 0, y: 0 }).fillStyle(0xe67e22).fillCircle(25, 25, 25);
-        pouGrafico.generateTexture('pou_temp', 50, 50);
-        this.jogador = this.physics.add.sprite(512, 100, 'pou_temp');
-        this.jogador.setCollideWorldBounds(true); // Impede o Pou de sair pelas bordas do ecrã
-        this.jogador.setBounce(0.1); // Salto ao bater no chão
-
-        //SISTEMA DE COLISÕES (Física Arcade)
-        this.physics.add.collider(this.jogador, this.plataformas);
-      
-        // ATIVAÇÃO DOS BOTÕES DO TECLADO (Input)
         if (this.input.keyboard) {
             this.teclas = this.input.keyboard.createCursorKeys();
         }
-        
+
         //TEXTURAS PARA PROTEÍNAS E OBSTÁCULOS
         const proteinaGrafica = this.make.graphics({ x: 0, y: 0 }).fillStyle(0x3498db).fillCircle(15, 15, 15);
         proteinaGrafica.generateTexture('proteina_temp', 30, 30);
         const obstaculoGrafico = this.make.graphics({ x: 0, y: 0 }).fillStyle(0xe74c3c).fillRect(0, 0, 30, 30);
         obstaculoGrafico.generateTexture('obstaculo_temp', 30, 30);
+        
+        // CRIAÇÃO DO JOGADOR - POU (Dynamic Body)
+        const pouGrafico = this.make.graphics({ x: 0, y: 0 }).fillStyle(0xe67e22).fillCircle(25, 25, 25);
+        pouGrafico.generateTexture('pou_temp', 50, 50);
+        this.jogador = this.physics.add.sprite(512, 500, 'pou_temp');
+        
+        this.physics.add.collider(this.jogador, this.plataformas, this.puloAutomatico, undefined, this);
 
         // Armazenar os objetos na memória
         this.proteinas = this.physics.add.group();
@@ -75,7 +89,9 @@ export class Game extends Scene
         // Quando o jogador toca num obstáculo, ativa a função 'baterNoObstaculo'
         this.physics.add.overlap(this.jogador, this.obstaculos, this.baterNoObstaculo, undefined, this); //Interação com obstáculos
 
-        //INTERFACE DO UTILIZADOR
+        // Barra da morte
+        this.add.rectangle(512, this.barraMorteY, 1024, 100, 0xff0000);
+
         const dicionario = this.cache.json.get('traducoes');
         const idiomaAtual = this.registry.get('idioma') || 'pt';
 
@@ -85,21 +101,15 @@ export class Game extends Scene
         this.textoPontuacao = this.add.text(16, 16, textoLabelProteina + '0', { fontSize: '32px', color: '#fff', fontFamily: 'Arial' });
         this.textoVidas = this.add.text(800, 16, textoLabelEnergia + '3', { fontSize: '32px', color: '#fff', fontFamily: 'Arial' });
 
-        //GERAÇÃO AUTOMÁTICA DOS ITENS
-        this.time.addEvent({
-            delay: 1500,
-            callback: () => {
-                this.gerarItem();
-            },
-            loop: true
-        });
+        this.textoPontuacao.setScrollFactor(0);
+        this.textoVidas.setScrollFactor(0);
+
     }
 
-    //O método update corre 60 vezes por segundo a ler as teclas
-    update ()
+   update ()
     {
         // Se as teclas não foram configuradas por segurança, não faz nada
-        if (!this.teclas || !this.jogador) return;
+        if (!this.teclas || !this.jogador || !this.jogador.body) return;
 
         // Movimento horizontal
         if (this.teclas.left.isDown)
@@ -112,15 +122,30 @@ export class Game extends Scene
         }
         else
         {
-            this.jogador.setVelocityX(0); //Se não carregar nada, o Pou fica parado horizontalmente
+            this.jogador.setVelocityX(0);
         }
 
-        // Movimento vertical
-        if (this.teclas.space.isDown && this.jogador.body.touching.down)
-        {
-            this.jogador.setVelocityY(-450); //Velocidade negativa, Pou sobe
+        // --- LÓGICA DA CÂMERA (Passo 2) ---
+        // Se o Pou subir acima do meio da tela atual (scrollY + 384), a câmera acompanha
+        const metadeDaTela = this.cameras.main.scrollY + 384;
+        if (this.jogador.y < metadeDaTela) {
+            this.cameras.main.scrollY = this.jogador.y - 384;
         }
 
+        // --- EFEITO PAREDE INFINITA ---
+        // Se o jogador sair pela direita, aparece na esquerda (e vice-versa)
+        if (this.jogador.x < -25) {
+            this.jogador.x = 1049;
+        } else if (this.jogador.x > 1049) {
+            this.jogador.x = -25;
+        }
+
+        // --- CONDIÇÃO DE GAME OVER (Cair) ---
+        // Se o jogador cair para fora da área visível inferior da câmera
+        if (this.jogador.y > this.cameras.main.scrollY + 800) {
+            this.scene.start('GameOver', { pontosFinais: this.pontuacao, resultado: 'derrota' });
+        }
+        
     }
 
     private gerarItem()
@@ -184,6 +209,17 @@ export class Game extends Scene
         if (this.vidas <= 0)
         {
             this.scene.start('GameOver', { pontosFinais: this.pontuacao, resultado: 'derrota' });
+        }
+    }
+
+    private puloAutomatico(jogadorObj: any, plataformaObj: any)
+    {
+        const jogador = jogadorObj as Phaser.Physics.Arcade.Sprite;
+        
+        // O jogador só pula se estiver batendo com o pé (touching.down)
+        if (jogador.body && jogador.body.touching.down) {
+            // Aplica uma força vertical negativa forte para ele subir
+            jogador.setVelocityY(-600); 
         }
     }
 }
