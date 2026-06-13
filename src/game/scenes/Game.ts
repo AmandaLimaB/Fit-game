@@ -16,9 +16,9 @@ export class Game extends Scene
     private textoPontuacao!: Phaser.GameObjects.Text;
     private textoVidas!: Phaser.GameObjects.Text;
 
-    private proximaPlataformaY: number = 400; 
+    private proximaPlataformaY: number = 400;
+    private ultimaPlataformaX: number = 512; 
     private barraMorteY: number = 800;
-
     constructor ()
     {
         super('Game');
@@ -31,16 +31,19 @@ export class Game extends Scene
         this.pontuacao = 0;
         this.vidas = 3;
 
-        //CRIAÇÃO DO CHÃO E PLATAFORMAS (Static Group)
+        this.proximaPlataformaY = 400; 
+        this.ultimaPlataformaX = 512; 
+        this.barraMorteY = 800;
+
+        //CRIAÇÃO DO CHÃO E PLATAFORMAS
         this.plataformas = this.physics.add.staticGroup();
         const chãoGrafico = this.make.graphics({ x: 0, y: 0 }).fillStyle(0x27ae60).fillRect(0, 0, 1024, 40);
         chãoGrafico.generateTexture('chão_temp', 1024, 40);
-        // CRIAÇÃO DAS PLATAFORMAS INICIAIS (Static Group)
+
         this.plataformas = this.physics.add.staticGroup();
         const platGrafica = this.make.graphics({ x: 0, y: 0 }).fillStyle(0x7f8c8d).fillRect(0, 0, 200, 30); // Blocos cinzentos
         platGrafica.generateTexture('plat_temp', 200, 30);
 
-        // Criamos uma plataforma inicial logo abaixo de onde o jogador nasce
         this.plataformas.create(512, 650, 'plat_temp');
         
         // Algumas plataformas de teste um pouco mais acima
@@ -68,7 +71,7 @@ export class Game extends Scene
         const obstaculoGrafico = this.make.graphics({ x: 0, y: 0 }).fillStyle(0xe74c3c).fillRect(0, 0, 30, 30);
         obstaculoGrafico.generateTexture('obstaculo_temp', 30, 30);
         
-        // CRIAÇÃO DO JOGADOR - POU (Dynamic Body)
+        // CRIAÇÃO DO JOGADOR - POU
         const pouGrafico = this.make.graphics({ x: 0, y: 0 }).fillStyle(0xe67e22).fillCircle(25, 25, 25);
         pouGrafico.generateTexture('pou_temp', 50, 50);
         this.jogador = this.physics.add.sprite(512, 500, 'pou_temp');
@@ -86,12 +89,11 @@ export class Game extends Scene
         //INTERAÇÃO DE SOBREPOSIÇÃO (Overlap)
         this.physics.add.overlap(this.jogador, this.proteinas, this.coletarProteina, undefined, this); //Interação com proteínas
         
-        // Quando o jogador toca num obstáculo, ativa a função 'baterNoObstaculo'
         this.physics.add.overlap(this.jogador, this.obstaculos, this.baterNoObstaculo, undefined, this); //Interação com obstáculos
 
-        // Barra da morte
         this.add.rectangle(512, this.barraMorteY, 1024, 100, 0xff0000);
 
+        // --- INTERFACE DO UTILIZADOR ---
         const dicionario = this.cache.json.get('traducoes');
         const idiomaAtual = this.registry.get('idioma') || 'pt';
 
@@ -104,11 +106,19 @@ export class Game extends Scene
         this.textoPontuacao.setScrollFactor(0);
         this.textoVidas.setScrollFactor(0);
 
+        // Temporizador de obstaculos
+        this.time.addEvent({
+            delay: 1500, 
+            callback: () => {
+                this.gerarObstaculoCaindo();
+            },
+            loop: true
+        });
+
     }
 
    update ()
     {
-        // Se as teclas não foram configuradas por segurança, não faz nada
         if (!this.teclas || !this.jogador || !this.jogador.body) return;
 
         // Movimento horizontal
@@ -125,24 +135,29 @@ export class Game extends Scene
             this.jogador.setVelocityX(0);
         }
 
-        // --- LÓGICA DA CÂMERA (Passo 2) ---
-        // Se o Pou subir acima do meio da tela atual (scrollY + 384), a câmera acompanha
-        const metadeDaTela = this.cameras.main.scrollY + 384;
-        if (this.jogador.y < metadeDaTela) {
-            this.cameras.main.scrollY = this.jogador.y - 384;
+        //Camera diniamica
+        this.cameras.main.scrollY = this.jogador.y - 384;
+
+        while (this.proximaPlataformaY > this.cameras.main.scrollY - 400) {
+            this.gerarNovaPlataforma();
         }
 
-        // --- EFEITO PAREDE INFINITA ---
-        // Se o jogador sair pela direita, aparece na esquerda (e vice-versa)
+        // Parede infinita
         if (this.jogador.x < -25) {
             this.jogador.x = 1049;
         } else if (this.jogador.x > 1049) {
             this.jogador.x = -25;
         }
 
-        // --- CONDIÇÃO DE GAME OVER (Cair) ---
-        // Se o jogador cair para fora da área visível inferior da câmera
-        if (this.jogador.y > this.cameras.main.scrollY + 800) {
+        // Destrói apenas os blocos vermelhos que já caíram no abismo, para o jogo não travar
+        this.obstaculos.getChildren().forEach((obsObj: any) => {
+            const obs = obsObj as Phaser.Physics.Arcade.Sprite;
+            if (obs.y > this.barraMorteY + 200) {
+                obs.destroy();
+            }
+        });
+
+        if (this.jogador.y > this.barraMorteY) {
             this.scene.start('GameOver', { pontosFinais: this.pontuacao, resultado: 'derrota' });
         }
         
@@ -154,12 +169,11 @@ export class Game extends Scene
             const xAleatorio = Phaser.Math.Between(50, 974);
             
             // Proteína 80% de chance e obstáculo 20% de chance
-            if (Phaser.Math.Between(1, 10) <= 8)
+            if (Phaser.Math.Between(1, 10) <= 7)
             {
-                // Criamos o item e dizemos ao código que ele é uma Sprite Física
+                // Sprite Física
                 const p = this.proteinas.create(xAleatorio, 0, 'proteina_temp') as Phaser.Physics.Arcade.Sprite;
                 
-                // Verificação de segurança: só aplica o ressalto se o corpo físico existir
                 if (p && p.body) {
                     p.setBounce(0, Phaser.Math.FloatBetween(0.2, 0.4)); 
                 }
@@ -195,7 +209,52 @@ export class Game extends Scene
         }
     }
 
-    //Consertar depois
+private gerarNovaPlataforma()
+    {
+        // 1. Calcula uma distância X "justa" para o jogador alcançar (pulo de no máximo 350 pixels para o lado)
+        let variacaoX = Phaser.Math.Between(-350, 350);
+        let novoX = this.ultimaPlataformaX + variacaoX;
+
+        // 2. Garante que a plataforma não nasça fora dos limites da tela
+        if (novoX < 100) novoX = 100;
+        if (novoX > 924) novoX = 924;
+
+        this.ultimaPlataformaX = novoX;
+
+        // 3. Cria a Plataforma
+        const plat = this.plataformas.create(novoX, this.proximaPlataformaY, 'plat_temp') as Phaser.Physics.Arcade.Sprite;
+        if (plat.body) {
+            plat.body.checkCollision.down = false;
+            plat.body.checkCollision.left = false;
+            plat.body.checkCollision.right = false;
+        }
+
+        // 40% de chance de proteina
+        if (Phaser.Math.Between(1, 100) <= 40) 
+        {
+            const p = this.proteinas.create(novoX, this.proximaPlataformaY - 30, 'proteina_temp') as Phaser.Physics.Arcade.Sprite;
+            if (p.body) p.body.allowGravity = false; // A proteína flutua paradinha na plataforma
+        }
+
+        this.proximaPlataformaY -= Phaser.Math.Between(120, 180);
+    }
+
+    private gerarObstaculoCaindo()
+    {
+        if (!this.cameras || !this.cameras.main) return;
+
+        const xAleatorio = Phaser.Math.Between(50, 974);
+        
+        const yNascimento = this.cameras.main.scrollY - 50;
+
+        const o = this.obstaculos.create(xAleatorio, yNascimento, 'obstaculo_temp') as Phaser.Physics.Arcade.Sprite;
+        
+        if (o && o.body) {
+            o.setBounce(0, 0.1);
+            // Cair com fisica padrao
+        }
+    }
+
     private baterNoObstaculo(playerObj: any, obstaculoObj: any)
     {
         const obstaculo = obstaculoObj as Phaser.Physics.Arcade.Sprite;
@@ -216,9 +275,7 @@ export class Game extends Scene
     {
         const jogador = jogadorObj as Phaser.Physics.Arcade.Sprite;
         
-        // O jogador só pula se estiver batendo com o pé (touching.down)
         if (jogador.body && jogador.body.touching.down) {
-            // Aplica uma força vertical negativa forte para ele subir
             jogador.setVelocityY(-600); 
         }
     }
