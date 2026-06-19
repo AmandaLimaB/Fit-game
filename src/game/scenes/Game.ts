@@ -30,6 +30,8 @@ export class Game extends Scene
         // Cor sólida recomendada para a Academia de Cristal (Azul Escuro Profundo)
         this.cameras.main.setBackgroundColor('#209cc9');
 
+        this.cameras.main.setRoundPixels(true);
+
         this.pontuacao = 0;
         this.vidas = 3;
 
@@ -70,9 +72,9 @@ export class Game extends Scene
         
         
         // CRIAÇÃO DO JOGADOR - POU
-        const pouGrafico = this.make.graphics({ x: 0, y: 0 }).fillStyle(0xe67e22).fillCircle(25, 25, 25);
-        pouGrafico.generateTexture('pou_temp', 50, 50);
-        this.jogador = this.physics.add.sprite(512, 500, 'pou_temp');
+        this.jogador = this.physics.add.sprite(512, 500, 'marombis');
+        this.jogador.setDisplaySize(150, 150);
+
         
         this.physics.add.collider(this.jogador, this.plataformas, this.puloAutomatico, undefined, this);
 
@@ -111,6 +113,7 @@ export class Game extends Scene
             },
             loop: true
         });
+
     }
 
     update ()
@@ -121,10 +124,12 @@ export class Game extends Scene
         if (this.teclas.left.isDown)
         {
             this.jogador.setVelocityX(-300);
+            this.jogador.setFlipX(true);
         }
         else if (this.teclas.right.isDown)
         {
             this.jogador.setVelocityX(300);
+            this.jogador.setFlipX(false);
         }
         else
         {
@@ -132,7 +137,8 @@ export class Game extends Scene
         }
 
         // Camera dinâmica
-        this.cameras.main.scrollY = this.jogador.y - 384;
+        const destinoCameraY = this.jogador.y - 384;
+        this.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, destinoCameraY, 0.03);
 
         while (this.proximaPlataformaY > this.cameras.main.scrollY - 400) {
             this.gerarNovaPlataforma();
@@ -218,6 +224,7 @@ export class Game extends Scene
     }
     private coletarProteina(playerObj: any, itemObj: any)
     {
+        this.sound.play('som_coin', { volume: 0.4 });
         const item = itemObj as Phaser.Physics.Arcade.Sprite;
         item.disableBody(true, true);
 
@@ -236,6 +243,8 @@ export class Game extends Scene
     {
         const obstaculo = obstaculoObj as Phaser.Physics.Arcade.Sprite;
         obstaculo.disableBody(true, true);
+
+        this.sound.play('som_peso', { volume: 0.5 });
 
         this.vidas -= 1;
         const dicionario = this.cache.json.get('traducoes');

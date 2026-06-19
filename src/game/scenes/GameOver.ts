@@ -74,6 +74,7 @@ export class GameOver extends Phaser.Scene
 
     private voltarAoMenu()
     {
+        this.sound.stopAll();
         this.scene.start('MainMenu');
     }
 }

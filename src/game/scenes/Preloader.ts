@@ -42,6 +42,19 @@ export class Preloader extends Scene
 
         this.load.image('milk_img', 'whey.png');
 
+        this.load.image('marombis', 'maromba.png');
+
+        this.load.audio('som_peso', 'headbutt.wav');
+
+        this.load.audio('som_jump', 'jump.wav');
+
+        this.load.audio('som_coin', 'coin.wav');
+
+        this.load.audio('som_entrada', 'entrada.wav');
+
+        this.load.audio('som_jogo', 'jogo.wav');
+
+
     }
 
     create ()

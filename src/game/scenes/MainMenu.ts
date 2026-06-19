@@ -14,6 +14,8 @@ export class MainMenu extends Scene
 
     create ()
     {
+        this.sound.stopAll();
+        this.sound.play('som_jogo', { loop: true, volume: 0.3 });
         this.background = this.add.image(512, 384, 'background').setDisplaySize(1024, 768);
         this.logo = this.add.image(512, 220, 'logo');
 
