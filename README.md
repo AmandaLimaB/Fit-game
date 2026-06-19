@@ -31,3 +31,5 @@ npm install
 npm run dev
 
 ### GitPages
+
+https://amandalimab.github.io/Fit-game/
