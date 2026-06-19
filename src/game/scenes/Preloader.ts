@@ -35,6 +35,13 @@ export class Preloader extends Scene
         this.load.image('logo', 'logo.png');
 
         this.load.json('traducoes', 'idiomas.json');// Carregar as traduções
+
+        this.load.image('plataforma_img', 'plataforma.png');
+
+        this.load.image('obs_img', 'peso.png');
+
+        this.load.image('milk_img', 'whey.png');
+
     }
 
     create ()
