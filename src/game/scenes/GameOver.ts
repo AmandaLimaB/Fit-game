@@ -31,7 +31,7 @@ export class GameOver extends Phaser.Scene
 
         let tituloTexto;
         if (this.resultado === 'vitoria') {
-            tituloTexto = 'Vitória!';
+            tituloTexto = dicionario[idiomaAtual].vitoria_titulo;
         } else {
             tituloTexto = dicionario[idiomaAtual].gameover_titulo;
         }

@@ -12,7 +12,7 @@ export class Game extends Scene
     private obstaculos!: Phaser.Physics.Arcade.Group;
 
     private pontuacao: number =0;
-    private vidas: number = 3;
+    private vidas: number = 10;
     private textoPontuacao!: Phaser.GameObjects.Text;
     private textoVidas!: Phaser.GameObjects.Text;
 
@@ -29,7 +29,7 @@ export class Game extends Scene
         this.cameras.main.setBackgroundColor('#2c3e50');
 
         this.pontuacao = 0;
-        this.vidas = 3;
+        this.vidas = 10;
 
         this.proximaPlataformaY = 400; 
         this.ultimaPlataformaX = 512; 
@@ -99,7 +99,7 @@ export class Game extends Scene
         const textoLabelEnergia = dicionario[idiomaAtual].energia;
 
         this.textoPontuacao = this.add.text(16, 16, textoLabelProteina + '0', { fontSize: '32px', color: '#fff', fontFamily: 'Arial' });
-        this.textoVidas = this.add.text(800, 16, textoLabelEnergia + '3', { fontSize: '32px', color: '#fff', fontFamily: 'Arial' });
+        this.textoVidas = this.add.text(800, 16, textoLabelEnergia + '10', { fontSize: '32px', color: '#fff', fontFamily: 'Arial' });
 
         this.textoPontuacao.setScrollFactor(0);
         this.textoVidas.setScrollFactor(0);
@@ -273,7 +273,7 @@ private gerarNovaPlataforma()
         const jogador = jogadorObj as Phaser.Physics.Arcade.Sprite;
         
         if (jogador.body && jogador.body.touching.down) {
-            jogador.setVelocityY(-600); 
+            jogador.setVelocityY(-400); 
         }
     }
 }

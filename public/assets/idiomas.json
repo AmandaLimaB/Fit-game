@@ -4,13 +4,15 @@
     "energia": "Energia: ",
     "menu_titulo": "MENU PRINCIPAL",
     "menu_instrucoes": "Pressione para Iniciar",
-    "gameover_titulo": "FIM DO TREINO"
+    "gameover_titulo": "FIM DO TREINO",
+    "vitoria_titulo": "PARABÉNS! VOCÊ VENCEU!"
   },
   "en": {
     "proteina": "Protein: ",
     "energia": "Energy: ",
     "menu_titulo": "MAIN MENU",
     "menu_instrucoes": "Click to Start",
-    "gameover_titulo": "WORKOUT OVER"
+    "gameover_titulo": "WORKOUT OVER",
+    "vitoria_titulo": "CONGRATULATIONS! YOU WON!"
   }
 }
