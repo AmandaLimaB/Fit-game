@@ -1,0 +1,16 @@
+{
+  "pt": {
+    "proteina": "Proteína: ",
+    "energia": "Energia: ",
+    "menu_titulo": "MENU PRINCIPAL",
+    "menu_instrucoes": "Pressione para Iniciar",
+    "gameover_titulo": "FIM DO TREINO"
+  },
+  "en": {
+    "proteina": "Protein: ",
+    "energia": "Energy: ",
+    "menu_titulo": "MAIN MENU",
+    "menu_instrucoes": "Click to Start",
+    "gameover_titulo": "WORKOUT OVER"
+  }
+}
