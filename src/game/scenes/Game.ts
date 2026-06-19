@@ -3,15 +3,15 @@ import { Scene } from 'phaser';
 
 export class Game extends Scene
 {
-    // Declaração de variáveis globais
+    //Declaração de variáveis globais
     private jogador!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
     private plataformas!: Phaser.Physics.Arcade.StaticGroup;
-    private teclas!: Phaser.Types.Input.Keyboard.CursorKeys;
+    private teclas !: Phaser.Types.Input.Keyboard.CursorKeys;
 
     private proteinas!: Phaser.Physics.Arcade.Group;
     private obstaculos!: Phaser.Physics.Arcade.Group;
 
-    private pontuacao: number = 0;
+    private pontuacao: number =0;
     private vidas: number = 3;
     private textoPontuacao!: Phaser.GameObjects.Text;
     private textoVidas!: Phaser.GameObjects.Text;
@@ -19,7 +19,6 @@ export class Game extends Scene
     private proximaPlataformaY: number = 400;
     private ultimaPlataformaX: number = 512; 
     private barraMorteY: number = 800;
-
     constructor ()
     {
         super('Game');
@@ -27,10 +26,7 @@ export class Game extends Scene
 
     create ()
     {
-        // Cor sólida recomendada para a Academia de Cristal (Azul Escuro Profundo)
-        this.cameras.main.setBackgroundColor('#209cc9');
-
-        this.cameras.main.setRoundPixels(true);
+        this.cameras.main.setBackgroundColor('#2c3e50');
 
         this.pontuacao = 0;
         this.vidas = 3;
@@ -39,22 +35,21 @@ export class Game extends Scene
         this.ultimaPlataformaX = 512; 
         this.barraMorteY = 800;
 
-        // CRIAÇÃO DO CHÃO
+        //CRIAÇÃO DO CHÃO E PLATAFORMAS
         this.plataformas = this.physics.add.staticGroup();
         const chãoGrafico = this.make.graphics({ x: 0, y: 0 }).fillStyle(0x27ae60).fillRect(0, 0, 1024, 40);
         chãoGrafico.generateTexture('chão_temp', 1024, 40);
 
-        // PRIMEIRAS PLATAFORMAS (Usando a imagem nova do Preloader)
-        const p1 = this.plataformas.create(512, 650, 'plataforma_img') as Phaser.Physics.Arcade.Sprite;
-        p1.setDisplaySize(200, 30).refreshBody();
-        
-        const p2 = this.plataformas.create(300, 450, 'plataforma_img') as Phaser.Physics.Arcade.Sprite;
-        p2.setDisplaySize(200, 30).refreshBody();
-        
-        const p3 = this.plataformas.create(724, 250, 'plataforma_img') as Phaser.Physics.Arcade.Sprite;
-        p3.setDisplaySize(200, 30).refreshBody();
+        this.plataformas = this.physics.add.staticGroup();
+        const platGrafica = this.make.graphics({ x: 0, y: 0 }).fillStyle(0x7f8c8d).fillRect(0, 0, 200, 30); // Blocos cinzentos
+        platGrafica.generateTexture('plat_temp', 200, 30);
 
-        // Ajuste CRÍTICO: Fazer as plataformas terem colisão apenas na parte de cima.
+        this.plataformas.create(512, 650, 'plat_temp');
+        
+        // Algumas plataformas de teste um pouco mais acima
+        this.plataformas.create(300, 450, 'plat_temp');
+        this.plataformas.create(724, 250, 'plat_temp');
+
         this.plataformas.getChildren().forEach((platObj: any) => {
             const plataforma = platObj as Phaser.Physics.Arcade.Sprite;
             if (plataforma.body) {
@@ -68,13 +63,16 @@ export class Game extends Scene
             this.teclas = this.input.keyboard.createCursorKeys();
         }
 
-        // TEXTURAS PARA PROTEÍNAS E OBSTÁCULOS
-        
+        //TEXTURAS PARA PROTEÍNAS E OBSTÁCULOS
+        const proteinaGrafica = this.make.graphics({ x: 0, y: 0 }).fillStyle(0x3498db).fillCircle(15, 15, 15);
+        proteinaGrafica.generateTexture('proteina_temp', 30, 30);
+        const obstaculoGrafico = this.make.graphics({ x: 0, y: 0 }).fillStyle(0xe74c3c).fillRect(0, 0, 30, 30);
+        obstaculoGrafico.generateTexture('obstaculo_temp', 30, 30);
         
         // CRIAÇÃO DO JOGADOR - POU
-        this.jogador = this.physics.add.sprite(512, 500, 'marombis');
-        this.jogador.setDisplaySize(150, 150);
-
+        const pouGrafico = this.make.graphics({ x: 0, y: 0 }).fillStyle(0xe67e22).fillCircle(25, 25, 25);
+        pouGrafico.generateTexture('pou_temp', 50, 50);
+        this.jogador = this.physics.add.sprite(512, 500, 'pou_temp');
         
         this.physics.add.collider(this.jogador, this.plataformas, this.puloAutomatico, undefined, this);
 
@@ -86,13 +84,14 @@ export class Game extends Scene
         this.physics.add.collider(this.proteinas, this.plataformas);
         this.physics.add.collider(this.obstaculos, this.plataformas);
 
-        // INTERAÇÃO DE SOBREPOSIÇÃO (Overlap)
-        this.physics.add.overlap(this.jogador, this.proteinas, this.coletarProteina, undefined, this);
-        this.physics.add.overlap(this.jogador, this.obstaculos, this.baterNoObstaculo, undefined, this);
+        //INTERAÇÃO DE SOBREPOSIÇÃO (Overlap)
+        this.physics.add.overlap(this.jogador, this.proteinas, this.coletarProteina, undefined, this); //Interação com proteínas
+        
+        this.physics.add.overlap(this.jogador, this.obstaculos, this.baterNoObstaculo, undefined, this); //Interação com obstáculos
 
         this.add.rectangle(512, this.barraMorteY, 1024, 100, 0xff0000);
 
-        // --- INTERFACE DO UTILIZADOR ---
+        // Interface do utilizado
         const dicionario = this.cache.json.get('traducoes');
         const idiomaAtual = this.registry.get('idioma') || 'pt';
 
@@ -105,7 +104,6 @@ export class Game extends Scene
         this.textoPontuacao.setScrollFactor(0);
         this.textoVidas.setScrollFactor(0);
 
-        // Temporizador de obstaculos
         this.time.addEvent({
             delay: 1500, 
             callback: () => {
@@ -116,7 +114,7 @@ export class Game extends Scene
 
     }
 
-    update ()
+   update ()
     {
         if (!this.teclas || !this.jogador || !this.jogador.body) return;
 
@@ -124,21 +122,18 @@ export class Game extends Scene
         if (this.teclas.left.isDown)
         {
             this.jogador.setVelocityX(-300);
-            this.jogador.setFlipX(true);
         }
         else if (this.teclas.right.isDown)
         {
             this.jogador.setVelocityX(300);
-            this.jogador.setFlipX(false);
         }
         else
         {
             this.jogador.setVelocityX(0);
         }
 
-        // Camera dinâmica
-        const destinoCameraY = this.jogador.y - 384;
-        this.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, destinoCameraY, 0.03);
+        //Camera diniamica
+        this.cameras.main.scrollY = this.jogador.y - 384;
 
         while (this.proximaPlataformaY > this.cameras.main.scrollY - 400) {
             this.gerarNovaPlataforma();
@@ -151,7 +146,7 @@ export class Game extends Scene
             this.jogador.x = -25;
         }
 
-        // Destrói os obstáculos que caíram no abismo
+        // Destrói apenas os blocos vermelhos que já caíram no abismo, para o jogo não travar
         this.obstaculos.getChildren().forEach((obsObj: any) => {
             const obs = obsObj as Phaser.Physics.Arcade.Sprite;
             if (obs.y > this.barraMorteY + 200) {
@@ -162,70 +157,42 @@ export class Game extends Scene
         if (this.jogador.y > this.barraMorteY) {
             this.scene.start('GameOver', { pontosFinais: this.pontuacao, resultado: 'derrota' });
         }
+        
     }
 
-    private gerarNovaPlataforma()
+    private gerarItem()
     {
-        let variacaoX = Phaser.Math.Between(-350, 350);
-        let novoX = this.ultimaPlataformaX + variacaoX;
-
-        if (novoX < 100) novoX = 100;
-        if (novoX > 924) novoX = 924;
-
-        this.ultimaPlataformaX = novoX;
-
-        // Cria a nova plataforma com a imagem correta
-        const plat = this.plataformas.create(novoX, this.proximaPlataformaY, 'plataforma_img') as Phaser.Physics.Arcade.Sprite;
-        plat.setDisplaySize(200, 30);
-        plat.refreshBody();
-        
-        if (plat.body) {
-            plat.body.checkCollision.down = false;
-            plat.body.checkCollision.left = false;
-            plat.body.checkCollision.right = false;
-        }
-
-        // 40% de chance de proteina
-        if (Phaser.Math.Between(1, 100) <= 40) 
-        {
-            // TROCOU 'proteina_temp' POR 'proteina_img'
-            const p = this.proteinas.create(novoX, this.proximaPlataformaY - 35, 'milk_img') as Phaser.Physics.Arcade.Sprite;
+        try {
+            const xAleatorio = Phaser.Math.Between(50, 974);
             
-            // Define o tamanho do prêmio na tela
-            p.setDisplaySize(50, 50); 
-            
-            if (p.body) {
-                p.body.allowGravity = false; // A proteína flutua paradinha na plataforma
-                p.body.setSize(p.width, p.height); // Ajusta a colisão física ao tamanho da imagem
+            // Proteína 80% de chance e obstáculo 20% de chance
+            if (Phaser.Math.Between(1, 10) <= 7)
+            {
+                // Sprite Física
+                const p = this.proteinas.create(xAleatorio, 0, 'proteina_temp') as Phaser.Physics.Arcade.Sprite;
+                
+                if (p && p.body) {
+                    p.setBounce(0, Phaser.Math.FloatBetween(0.2, 0.4)); 
+                }
             }
+            else
+            {
+                const o = this.obstaculos.create(xAleatorio, 0, 'obstaculo_temp') as Phaser.Physics.Arcade.Sprite;
+                
+                if (o && o.body) {
+                    o.setBounce(0, 0.1);
+                }
+            }
+        } catch (erro) {
+            console.error("Erro fatal evitado na geração do item:", erro);
         }
-        this.proximaPlataformaY -= Phaser.Math.Between(120, 180);
     }
 
-    private gerarObstaculoCaindo()
-    {
-        if (!this.cameras || !this.cameras.main) return;
-
-        const xAleatorio = Phaser.Math.Between(50, 974);
-        const yNascimento = this.cameras.main.scrollY - 50;
-
-        const o = this.obstaculos.create(xAleatorio, yNascimento, 'obs_img') as Phaser.Physics.Arcade.Sprite;
-        
-        // Define o tamanho visual do obstáculo na tela (mude 40, 40 para o tamanho que preferir)
-        o.setDisplaySize(50, 50); 
-        
-        if (o && o.body) {
-            o.setBounce(0, 0.1);
-            // Ajusta o tamanho da caixinha de colisão para o tamanho da nova imagem
-            o.body.setSize(o.width, o.height); 
-        }
-
-        
-    }
     private coletarProteina(playerObj: any, itemObj: any)
     {
-        this.sound.play('som_coin', { volume: 0.4 });
         const item = itemObj as Phaser.Physics.Arcade.Sprite;
+        
+        // Remove o item do ecrã e da memória física
         item.disableBody(true, true);
 
         this.pontuacao += 100;
@@ -235,7 +202,53 @@ export class Game extends Scene
 
         if (this.pontuacao >= 1000)
         {
-            this.scene.start('GameOver', { pontosFinais: this.pontuacao, resultado: 'vitoria' });
+            this.scene.start('GameOver', {pontosFinais: this.pontuacao, resultado: 'vitoria'});
+        }
+    }
+
+private gerarNovaPlataforma()
+    {
+        // 1. Calcula uma distância X "justa" para o jogador alcançar (pulo de no máximo 350 pixels para o lado)
+        let variacaoX = Phaser.Math.Between(-350, 350);
+        let novoX = this.ultimaPlataformaX + variacaoX;
+
+        // 2. Garante que a plataforma não nasça fora dos limites da tela
+        if (novoX < 100) novoX = 100;
+        if (novoX > 924) novoX = 924;
+
+        this.ultimaPlataformaX = novoX;
+
+        // 3. Cria a Plataforma
+        const plat = this.plataformas.create(novoX, this.proximaPlataformaY, 'plat_temp') as Phaser.Physics.Arcade.Sprite;
+        if (plat.body) {
+            plat.body.checkCollision.down = false;
+            plat.body.checkCollision.left = false;
+            plat.body.checkCollision.right = false;
+        }
+
+        // 40% de chance de proteina
+        if (Phaser.Math.Between(1, 100) <= 40) 
+        {
+            const p = this.proteinas.create(novoX, this.proximaPlataformaY - 30, 'proteina_temp') as Phaser.Physics.Arcade.Sprite;
+            if (p.body) p.body.allowGravity = false; // A proteína flutua paradinha na plataforma
+        }
+
+        this.proximaPlataformaY -= Phaser.Math.Between(120, 180);
+    }
+
+    private gerarObstaculoCaindo()
+    {
+        if (!this.cameras || !this.cameras.main) return;
+
+        const xAleatorio = Phaser.Math.Between(50, 974);
+        
+        const yNascimento = this.cameras.main.scrollY - 50;
+
+        const o = this.obstaculos.create(xAleatorio, yNascimento, 'obstaculo_temp') as Phaser.Physics.Arcade.Sprite;
+        
+        if (o && o.body) {
+            o.setBounce(0, 0.1);
+            // Cair com fisica padrao
         }
     }
 
@@ -243,8 +256,6 @@ export class Game extends Scene
     {
         const obstaculo = obstaculoObj as Phaser.Physics.Arcade.Sprite;
         obstaculo.disableBody(true, true);
-
-        this.sound.play('som_peso', { volume: 0.5 });
 
         this.vidas -= 1;
         const dicionario = this.cache.json.get('traducoes');
@@ -260,6 +271,7 @@ export class Game extends Scene
     private puloAutomatico(jogadorObj: any, plataformaObj: any)
     {
         const jogador = jogadorObj as Phaser.Physics.Arcade.Sprite;
+        
         if (jogador.body && jogador.body.touching.down) {
             jogador.setVelocityY(-600); 
         }
