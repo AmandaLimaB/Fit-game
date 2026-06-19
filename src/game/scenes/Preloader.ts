@@ -32,27 +32,27 @@ export class Preloader extends Scene
         //  Load the assets for the game - Replace with your own assets
         this.load.setPath('assets');
 
-        this.load.image('logo', 'logo.png');
+        this.load.image('logo', 'imagens/logo.png');
 
         this.load.json('traducoes', 'idiomas.json');// Carregar as traduções
 
-        this.load.image('plataforma_img', 'plataforma.png');
+        this.load.image('plataforma_img', 'imagens/plataforma.png');
 
-        this.load.image('obs_img', 'peso.png');
+        this.load.image('obs_img', 'imagens/peso.png');
 
-        this.load.image('milk_img', 'whey.png');
+        this.load.image('milk_img', 'imagens/whey.png');
 
-        this.load.image('marombis', 'maromba.png');
+        this.load.image('marombis', 'imagens/maromba.png');
 
-        this.load.audio('som_peso', 'headbutt.wav');
+        this.load.audio('som_peso', 'sounds/headbutt.wav');
 
-        this.load.audio('som_jump', 'jump.wav');
+        this.load.audio('som_jump', 'sounds/jump.wav');
 
-        this.load.audio('som_coin', 'coin.wav');
+        this.load.audio('som_coin', 'sounds/coin.wav');
 
-        this.load.audio('som_entrada', 'entrada.wav');
+        this.load.audio('som_entrada', 'sounds/entrada.wav');
 
-        this.load.audio('som_jogo', 'jogo.wav');
+        this.load.audio('som_jogo', 'sounds/jogo.wav');
 
 
     }
